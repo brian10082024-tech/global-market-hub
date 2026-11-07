@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Market Hub | Product Manager</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f2f5f9;color:#172b45;margin:0}
+header{background:#102b50;color:white;padding:22px;text-align:center}
+main{max-width:750px;margin:25px auto;padding:15px}
+.card{background:white;padding:20px;border-radius:12px;margin-bottom:18px}
+input,textarea,select{width:100%;padding:12px;margin:7px 0 14px;border:1px solid #ccd4df;border-radius:7px;box-sizing:border-box;font-size:15px}
+button{padding:12px 16px;border:0;border-radius:7px;background:#1766ad;color:white;margin:5px 4px 5px 0;font-size:14px}
+.delete{background:#b52b35}
+.product{border:1px solid #e1e6ed;padding:12px;border-radius:8px;margin:10px 0}
+small{color:#65748a}
+</style>
+</head>
+<body>
+<header>
+<h2>GLOBAL MARKET HUB</h2>
+<p>Product Management Dashboard</p>
+</header>
+<main>
+<div class="card">
+<h3>Add or Edit a Product</h3>
+<label>Product name</label>
+<input id="name" placeholder="Example: Wireless Headphones">
+<label>Category</label>
+<select id="category">
+<option>Electronics</option>
+<option>Fashion</option>
+<option>Beauty</option>
+<option>Home</option>
+<option>Sports</option>
+<option>Technology</option>
+<option>Accessories</option>
+<option>Other</option>
+</select>
+<label>Description</label>
+<textarea id="description" rows="3" placeholder="Describe the product"></textarea>
+<label>Emoji</label>
+<input id="emoji" placeholder="Example: 🎧">
+<button onclick="saveProduct()">Save Product</button>
+<button onclick="clearForm()">Clear</button>
+<p id="message"></p>
+</div>
+
+<div class="card">
+<h3>Catalogue Products</h3>
+<p><small>Products currently loaded from your website catalogue.</small></p>
+<div id="productList">Loading catalogue...</div>
+<button onclick="exportCatalogue()">Export products.json</button>
+</div>
+
+<div class="card">
+<h3>Publish your changes</h3>
+<p>Export the updated catalogue, then upload it to your GitHub repository, replacing the existing products.json file.</p>
+<a href="https://github.com/brian10082024-tech/global-market-hub" target="_blank">Open GitHub Repository</a>
+</div>
+</main>
+
+<script>
+let products=[];
+let editingId=null;
+
+async function loadCatalogue(){
+ try{
+  const response=await fetch("./products.json");
+  if(!response.ok) throw new Error("Catalogue unavailable");
+  const data=await response.json();
+  products=data.products||[];
+  showProducts();
+ }catch(error){
+  document.getElementById("productList").textContent="Could not load products.json. Check that it exists in the repository root.";
+ }
+}
+
+function saveProduct(){
+ const name=document.getElementById("name").value.trim();
+ const category=document.getElementById("category").value;
+ const description=document.getElementById("description").value.trim();
+ const emoji=document.getElementById("emoji").value.trim()||"🌍";
+
+ if(!name){
+  document.getElementById("message").textContent="Enter a product name first.";
+  return;
+ }
+
+ if(editingId!==null){
+  const product=products.find(p=>p.id===editingId);
+  if(product){
+   Object.assign(product,{name,category,description,emoji});
+  }
+ }else{
+  products.push({
+   id:Date.now(),
+   name,category,description,emoji,
+   status:"preview",
+   affiliateUrl:""
+  });
+ }
+
+ clearForm();
+ showProducts();
+ document.getElementById("message").textContent="Product saved in this dashboard. Export the catalogue to publish it.";
+}
+
+function editProduct(id){
+ const p=products.find(item=>item.id===id);
+ if(!p)return;
+ editingId=id;
+ document.getElementById("name").value=p.name||"";
+ document.getElementById("category").value=p.category||"Other";
+ document.getElementById("description").value=p.description||"";
+ document.getElementById("emoji").value=p.emoji||"🌍";
+ window.scrollTo(0,0);
+}
+
+function deleteProduct(id){
+ if(!confirm("Remove this product from the catalogue?"))return;
+ products=products.filter(p=>p.id!==id);
+ showProducts();
+}
+
+function clearForm(){
+ editingId=null;
+ document.getElementById("name").value="";
+ document.getElementById("description").value="";
+ document.getElementById("emoji").value="";
+ document.getElementById("message").textContent="";
+}
+
+function showProducts(){
+ const list=document.getElementById("productList");
+ list.replaceChildren();
+
+ if(!products.length){
+  list.textContent="No products in the catalogue yet.";
+  return;
+ }
+
+ products.forEach(p=>{
+  const item=document.createElement("div");
+  item.className="product";
+  const title=document.createElement("strong");
+  title.textContent=(p.emoji||"🌍")+" "+p.name;
+  const detail=document.createElement("p");
+  detail.textContent=p.category+" — "+(p.description||"");
+  const edit=document.createElement("button");
+  edit.textContent="Edit";
+  edit.onclick=()=>editProduct(p.id);
+  const remove=document.createElement("button");
+  remove.textContent="Delete";
+  remove.className="delete";
+  remove.onclick=()=>deleteProduct(p.id);
+  item.append(title,detail,edit,remove);
+  list.appendChild(item);
+ });
+}
+
+function exportCatalogue(){
+ const data={
+  business:"Global Market Hub",
+  currency:"USD",
+  products:products
+ };
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);
+ const link=document.createElement("a");
+ link.href=url;
+ link.download="products.json";
+ link.click();
+ URL.revokeObjectURL(url);
+}
+
+loadCatalogue();
+</script>
+</body>
+</html>
