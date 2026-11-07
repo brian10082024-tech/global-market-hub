@@ -2,5 +2,42 @@
 {
   "business": "Global Market Hub",
   "currency": "USD",
-  "products": []
+  "products": [
+    {
+      "id": 1,
+      "name": "Wireless Earbuds",
+      "category": "Electronics",
+      "description": "Example listing for wireless audio products.",
+      "emoji": "🎧",
+      "status": "preview",
+      "affiliateUrl": ""
+    },
+    {
+      "id": 2,
+      "name": "Smart Watch",
+      "category": "Technology",
+      "description": "Example listing for smart wearable technology.",
+      "emoji": "⌚",
+      "status": "preview",
+      "affiliateUrl": ""
+    },
+    {
+      "id": 3,
+      "name": "Travel Backpack",
+      "category": "Fashion",
+      "description": "Example listing for travel accessories.",
+      "emoji": "🎒",
+      "status": "preview",
+      "affiliateUrl": ""
+    },
+    {
+      "id": 4,
+      "name": "Home Accessories",
+      "category": "Home",
+      "description": "Example listing for home products.",
+      "emoji": "🏠",
+      "status": "preview",
+      "affiliateUrl": ""
+    }
+  ]
 }
