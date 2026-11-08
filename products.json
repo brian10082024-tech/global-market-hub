@@ -1,4 +1,3 @@
-
 {
   "business": "Global Market Hub",
   "currency": "USD",
@@ -36,6 +35,15 @@
       "category": "Home",
       "description": "Example listing for home products.",
       "emoji": "🏠",
+      "status": "preview",
+      "affiliateUrl": ""
+    },
+    {
+      "id": 1794144193800,
+      "name": "Bluetooth Speaker",
+      "category": "Electronics",
+      "description": "Portable wireless Bluetooth speaker.",
+      "emoji": "🔊",
       "status": "preview",
       "affiliateUrl": ""
     }
