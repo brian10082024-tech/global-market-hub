@@ -4,29 +4,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Global Market Hub | Product Manager</title>
+<title>Global Market Hub | Affiliate Manager</title>
+
 <style>
+*{box-sizing:border-box}
 body{font-family:Arial,sans-serif;background:#f2f5f9;color:#172b45;margin:0}
 header{background:#102b50;color:white;padding:22px;text-align:center}
-main{max-width:750px;margin:25px auto;padding:15px}
+main{max-width:850px;margin:25px auto;padding:15px}
 .card{background:white;padding:20px;border-radius:12px;margin-bottom:18px}
-input,textarea,select{width:100%;padding:12px;margin:7px 0 14px;border:1px solid #ccd4df;border-radius:7px;box-sizing:border-box;font-size:15px}
-button{padding:12px 16px;border:0;border-radius:7px;background:#1766ad;color:white;margin:5px 4px 5px 0;font-size:14px}
+input,textarea,select{
+width:100%;padding:12px;margin:7px 0 14px;
+border:1px solid #ccd4df;border-radius:7px;
+font-size:15px;background:white
+}
+button{
+padding:12px 16px;border:0;border-radius:7px;
+background:#1766ad;color:white;margin:5px 4px 5px 0;
+font-size:14px;cursor:pointer
+}
 .delete{background:#b52b35}
-.product{border:1px solid #e1e6ed;padding:12px;border-radius:8px;margin:10px 0}
+.secondary{background:#52677e}
+.product{border:1px solid #e1e6ed;padding:14px;border-radius:8px;margin:12px 0}
+.product img{width:100%;max-width:180px;max-height:140px;object-fit:contain;display:block;margin:8px 0}
 small{color:#65748a}
+.status{font-weight:bold}
+a{overflow-wrap:anywhere}
+.message{padding:10px 0;font-weight:bold}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:550px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
+
 <body>
+
 <header>
 <h2>GLOBAL MARKET HUB</h2>
-<p>Product Management Dashboard</p>
+<p>Affiliate Product Management Dashboard</p>
 </header>
+
 <main>
+
 <div class="card">
 <h3>Add or Edit a Product</h3>
+
 <label>Product name</label>
 <input id="name" placeholder="Example: Wireless Headphones">
+
 <label>Category</label>
 <select id="category">
 <option>Electronics</option>
@@ -38,144 +61,423 @@ small{color:#65748a}
 <option>Accessories</option>
 <option>Other</option>
 </select>
+
 <label>Description</label>
 <textarea id="description" rows="3" placeholder="Describe the product"></textarea>
+
+<label>Product image URL</label>
+<input id="imageUrl" type="url" placeholder="https://example.com/product-image.jpg">
+
+<div class="grid">
+<div>
+<label>Price</label>
+<input id="price" type="number" min="0" step="0.01" placeholder="Example: 49.99">
+</div>
+<div>
+<label>Currency</label>
+<select id="currency">
+<option>USD</option>
+<option>KES</option>
+<option>EUR</option>
+<option>GBP</option>
+<option>INR</option>
+<option>CAD</option>
+<option>AUD</option>
+</select>
+</div>
+</div>
+
+<label>Merchant / Supplier name</label>
+<input id="merchant" placeholder="Example: Amazon, AliExpress, supplier name">
+
+<label>Affiliate tracking URL</label>
+<input id="affiliateUrl" type="url" placeholder="Paste your affiliate link here">
+
+<label>Commission rate (%)</label>
+<input id="commissionRate" type="number" min="0" max="100" step="0.01" placeholder="Example: 8">
+
+<label>Product status</label>
+<select id="status">
+<option value="preview">Preview</option>
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+
 <label>Emoji</label>
 <input id="emoji" placeholder="Example: 🎧">
+
 <button onclick="saveProduct()">Save Product</button>
-<button onclick="clearForm()">Clear</button>
-<p id="message"></p>
+<button class="secondary" onclick="clearForm()">Clear</button>
+
+<p id="message" class="message"></p>
 </div>
 
 <div class="card">
-<h3>Catalogue Products</h3>
-<p><small>Products currently loaded from your website catalogue.</small></p>
+<h3>Affiliate Product Catalogue</h3>
+<p><small>Manage your products and affiliate information.</small></p>
+
 <div id="productList">Loading catalogue...</div>
+
 <button onclick="exportCatalogue()">Export products.json</button>
+<button class="secondary" onclick="loadCatalogue()">Reload Catalogue</button>
 </div>
 
 <div class="card">
-<h3>Publish your changes</h3>
-<p>Export the updated catalogue, then upload it to your GitHub repository, replacing the existing products.json file.</p>
-<a href="https://github.com/brian10082024-tech/global-market-hub" target="_blank">Open GitHub Repository</a>
+<h3>Publishing Instructions</h3>
+<p>
+Export your updated catalogue and upload the downloaded
+products.json file to the root of your GitHub repository,
+replacing the existing products.json.
+</p>
+
+<p>
+<a href="https://github.com/brian10082024-tech/global-market-hub"
+target="_blank" rel="noopener">Open GitHub Repository</a>
+</p>
 </div>
+
+<div class="card">
+<h3>System Information</h3>
+<p>Products loaded: <strong id="totalProducts">0</strong></p>
+<p>Active products: <strong id="activeProducts">0</strong></p>
+<p>Products with affiliate links: <strong id="linkedProducts">0</strong></p>
+</div>
+
 </main>
 
 <script>
-let products=[];
-let editingId=null;
+let products = [];
+let editingId = null;
+
+const fields = [
+"name",
+"category",
+"description",
+"imageUrl",
+"price",
+"currency",
+"merchant",
+"affiliateUrl",
+"commissionRate",
+"status",
+"emoji"
+];
+
+function getValue(id){
+return document.getElementById(id).value.trim();
+}
+
+function setMessage(message){
+document.getElementById("message").textContent = message;
+}
+
+function validWebUrl(value){
+if(!value) return true;
+
+try{
+const url = new URL(value);
+return url.protocol === "https:" || url.protocol === "http:";
+}catch(error){
+return false;
+}
+
+}
 
 async function loadCatalogue(){
- try{
-  const response=await fetch("./products.json");
-  if(!response.ok) throw new Error("Catalogue unavailable");
-  const data=await response.json();
-  products=data.products||[];
-  showProducts();
- }catch(error){
-  document.getElementById("productList").textContent="Could not load products.json. Check that it exists in the repository root.";
- }
+const list = document.getElementById("productList");
+list.textContent = "Loading catalogue...";
+
+try{
+const response = await fetch("./products.json?refresh=" + Date.now());
+
+if(!response.ok){
+throw new Error("Could not load products.json");
+}
+
+const data = await response.json();
+
+products = Array.isArray(data) ? data : (data.products || []);
+
+showProducts();
+
+}catch(error){
+list.textContent =
+"Could not load products.json. Check that the file exists in the repository root.";
+}
+
 }
 
 function saveProduct(){
- const name=document.getElementById("name").value.trim();
- const category=document.getElementById("category").value;
- const description=document.getElementById("description").value.trim();
- const emoji=document.getElementById("emoji").value.trim()||"🌍";
 
- if(!name){
-  document.getElementById("message").textContent="Enter a product name first.";
-  return;
- }
+const name = getValue("name");
+const category = getValue("category");
+const description = getValue("description");
+const imageUrl = getValue("imageUrl");
+const priceValue = getValue("price");
+const currency = getValue("currency");
+const merchant = getValue("merchant");
+const affiliateUrl = getValue("affiliateUrl");
+const commissionValue = getValue("commissionRate");
+const status = getValue("status");
+const emoji = getValue("emoji") || "🌍";
 
- if(editingId!==null){
-  const product=products.find(p=>p.id===editingId);
-  if(product){
-   Object.assign(product,{name,category,description,emoji});
-  }
- }else{
-  products.push({
-   id:Date.now(),
-   name,category,description,emoji,
-   status:"preview",
-   affiliateUrl:""
-  });
- }
+if(!name){
+setMessage("Enter a product name first.");
+return;
+}
 
- clearForm();
- showProducts();
- document.getElementById("message").textContent="Product saved in this dashboard. Export the catalogue to publish it.";
+if(!validWebUrl(imageUrl)){
+setMessage("Enter a valid product image URL.");
+return;
+}
+
+if(!validWebUrl(affiliateUrl)){
+setMessage("Enter a valid affiliate URL.");
+return;
+}
+
+const price = priceValue === "" ? null : Number(priceValue);
+const commissionRate = commissionValue === "" ? null : Number(commissionValue);
+
+if(price !== null && (!Number.isFinite(price) || price < 0)){
+setMessage("Enter a valid product price.");
+return;
+}
+
+if(commissionRate !== null &&
+(!Number.isFinite(commissionRate) || commissionRate < 0 || commissionRate > 100)){
+setMessage("Commission must be between 0 and 100.");
+return;
+}
+
+const productData = {
+name,
+category,
+description,
+imageUrl,
+price,
+currency,
+merchant,
+affiliateUrl,
+commissionRate,
+status,
+emoji
+};
+
+if(editingId !== null){
+
+const product = products.find(p => p.id === editingId);
+
+if(product){
+Object.assign(product, productData);
+}
+
+}else{
+
+products.push({
+id: Date.now(),
+...productData
+});
+
+}
+
+clearForm();
+showProducts();
+
+setMessage("Product saved. Export products.json to publish your changes.");
+
 }
 
 function editProduct(id){
- const p=products.find(item=>item.id===id);
- if(!p)return;
- editingId=id;
- document.getElementById("name").value=p.name||"";
- document.getElementById("category").value=p.category||"Other";
- document.getElementById("description").value=p.description||"";
- document.getElementById("emoji").value=p.emoji||"🌍";
- window.scrollTo(0,0);
+
+const product = products.find(p => p.id === id);
+
+if(!product) return;
+
+editingId = id;
+
+fields.forEach(field => {
+
+const element = document.getElementById(field);
+
+let value = product[field];
+
+if(value === undefined || value === null){
+value = "";
+}
+
+element.value = value;
+
+});
+
+window.scrollTo({top:0,behavior:"smooth"});
+
+setMessage("Editing product: " + product.name);
+
 }
 
 function deleteProduct(id){
- if(!confirm("Remove this product from the catalogue?"))return;
- products=products.filter(p=>p.id!==id);
- showProducts();
+
+if(!confirm("Remove this product from the catalogue?")){
+return;
+}
+
+products = products.filter(p => p.id !== id);
+
+showProducts();
+
+setMessage("Product removed. Export the catalogue to publish the change.");
+
 }
 
 function clearForm(){
- editingId=null;
- document.getElementById("name").value="";
- document.getElementById("description").value="";
- document.getElementById("emoji").value="";
- document.getElementById("message").textContent="";
+
+editingId = null;
+
+fields.forEach(field => {
+document.getElementById(field).value = "";
+});
+
+document.getElementById("category").value = "Electronics";
+document.getElementById("currency").value = "USD";
+document.getElementById("status").value = "preview";
+
+setMessage("");
+
 }
 
 function showProducts(){
- const list=document.getElementById("productList");
- list.replaceChildren();
 
- if(!products.length){
-  list.textContent="No products in the catalogue yet.";
-  return;
- }
+const list = document.getElementById("productList");
 
- products.forEach(p=>{
-  const item=document.createElement("div");
-  item.className="product";
-  const title=document.createElement("strong");
-  title.textContent=(p.emoji||"🌍")+" "+p.name;
-  const detail=document.createElement("p");
-  detail.textContent=p.category+" — "+(p.description||"");
-  const edit=document.createElement("button");
-  edit.textContent="Edit";
-  edit.onclick=()=>editProduct(p.id);
-  const remove=document.createElement("button");
-  remove.textContent="Delete";
-  remove.className="delete";
-  remove.onclick=()=>deleteProduct(p.id);
-  item.append(title,detail,edit,remove);
-  list.appendChild(item);
- });
+list.replaceChildren();
+
+if(!products.length){
+list.textContent = "No products in the catalogue yet.";
+}
+
+products.forEach(product => {
+
+const item = document.createElement("div");
+item.className = "product";
+
+const title = document.createElement("strong");
+title.textContent = (product.emoji || "🌍") + " " + product.name;
+
+const category = document.createElement("p");
+category.textContent = product.category || "Other";
+
+const description = document.createElement("p");
+description.textContent = product.description || "";
+
+item.append(title, category, description);
+
+if(product.imageUrl){
+
+const image = document.createElement("img");
+image.src = product.imageUrl;
+image.alt = product.name;
+image.loading = "lazy";
+image.onerror = () => image.remove();
+
+item.appendChild(image);
+
+}
+
+const price = document.createElement("p");
+price.textContent = product.price !== null && product.price !== undefined
+? "Price: " + product.price + " " + (product.currency || "USD")
+: "Price: Not provided";
+
+const merchant = document.createElement("p");
+merchant.textContent = "Merchant: " + (product.merchant || "Not provided");
+
+const commission = document.createElement("p");
+commission.textContent = "Commission: " +
+(product.commissionRate !== null && product.commissionRate !== undefined
+? product.commissionRate + "%"
+: "Not provided");
+
+const status = document.createElement("p");
+status.className = "status";
+status.textContent = "Status: " + (product.status || "preview").toUpperCase();
+
+item.append(price, merchant, commission, status);
+
+if(product.affiliateUrl){
+
+const affiliate = document.createElement("a");
+affiliate.href = product.affiliateUrl;
+affiliate.textContent = "View affiliate link";
+affiliate.target = "_blank";
+affiliate.rel = "noopener noreferrer";
+item.appendChild(affiliate);
+
+}else{
+
+const noLink = document.createElement("p");
+noLink.textContent = "Affiliate link not added yet.";
+item.appendChild(noLink);
+
+}
+
+const edit = document.createElement("button");
+edit.textContent = "Edit";
+edit.onclick = () => editProduct(product.id);
+
+const remove = document.createElement("button");
+remove.textContent = "Delete";
+remove.className = "delete";
+remove.onclick = () => deleteProduct(product.id);
+
+item.append(edit, remove);
+
+list.appendChild(item);
+
+});
+
+document.getElementById("totalProducts").textContent = products.length;
+
+document.getElementById("activeProducts").textContent =
+products.filter(p => p.status === "active").length;
+
+document.getElementById("linkedProducts").textContent =
+products.filter(p => p.affiliateUrl).length;
+
 }
 
 function exportCatalogue(){
- const data={
-  business:"Global Market Hub",
-  currency:"USD",
-  products:products
- };
- const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
- const url=URL.createObjectURL(blob);
- const link=document.createElement("a");
- link.href=url;
- link.download="products.json";
- link.click();
- URL.revokeObjectURL(url);
+
+const data = {
+business: "Global Market Hub",
+currency: "USD",
+products: products
+};
+
+const blob = new Blob(
+[JSON.stringify(data, null, 2)],
+{type:"application/json"}
+);
+
+const url = URL.createObjectURL(blob);
+
+const link = document.createElement("a");
+link.href = url;
+link.download = "products.json";
+
+document.body.appendChild(link);
+link.click();
+link.remove();
+
+setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+setMessage("Catalogue exported. Upload products.json to GitHub to publish.");
+
 }
 
 loadCatalogue();
+
 </script>
+
 </body>
 </html>
