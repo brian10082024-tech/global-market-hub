@@ -1,51 +1,73 @@
-{
-  "business": "Global Market Hub",
-  "currency": "USD",
-  "products": [
-    {
-      "id": 1,
-      "name": "Wireless Earbuds",
-      "category": "Electronics",
-      "description": "Example listing for wireless audio products.",
-      "emoji": "🎧",
-      "status": "preview",
-      "affiliateUrl": ""
-    },
-    {
-      "id": 2,
-      "name": "Smart Watch",
-      "category": "Technology",
-      "description": "Example listing for smart wearable technology.",
-      "emoji": "⌚",
-      "status": "preview",
-      "affiliateUrl": ""
-    },
-    {
-      "id": 3,
-      "name": "Travel Backpack",
-      "category": "Fashion",
-      "description": "Example listing for travel accessories.",
-      "emoji": "🎒",
-      "status": "preview",
-      "affiliateUrl": ""
-    },
-    {
-      "id": 4,
-      "name": "Home Accessories",
-      "category": "Home",
-      "description": "Example listing for home products.",
-      "emoji": "🏠",
-      "status": "preview",
-      "affiliateUrl": ""
-    },
-    {
-      "id": 1794144193800,
-      "name": "Bluetooth Speaker",
-      "category": "Electronics",
-      "description": "Portable wireless Bluetooth speaker.",
-      "emoji": "🔊",
-      "status": "preview",
-      "affiliateUrl": ""
-    }
-  ]
-}
+
+[
+  {
+    "id": 1,
+    "name": "Wireless Earbuds",
+    "category": "Electronics",
+    "description": "High-quality wireless earbuds with clear sound and long battery life.",
+    "image": "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1",
+    "price": 25,
+    "currency": "USD",
+    "merchant": "Amazon",
+    "affiliateUrl": "https://www.amazon.com/",
+    "commission": 5,
+    "status": "active",
+    "emoji": "🎧"
+  },
+  {
+    "id": 2,
+    "name": "Smart Watch",
+    "category": "Electronics",
+    "description": "Smart watch for fitness tracking and everyday activities.",
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+    "price": 45,
+    "currency": "USD",
+    "merchant": "Amazon",
+    "affiliateUrl": "https://www.amazon.com/",
+    "commission": 5,
+    "status": "active",
+    "emoji": "⌚"
+  },
+  {
+    "id": 3,
+    "name": "Laptop Backpack",
+    "category": "Fashion",
+    "description": "Stylish and durable backpack suitable for laptops and travel.",
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62",
+    "price": 35,
+    "currency": "USD",
+    "merchant": "Amazon",
+    "affiliateUrl": "https://www.amazon.com/",
+    "commission": 5,
+    "status": "active",
+    "emoji": "🎒"
+  },
+  {
+    "id": 4,
+    "name": "Running Shoes",
+    "category": "Fashion",
+    "description": "Comfortable athletic shoes for running and everyday use.",
+    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+    "price": 60,
+    "currency": "USD",
+    "merchant": "Amazon",
+    "affiliateUrl": "https://www.amazon.com/",
+    "commission": 5,
+    "status": "active",
+    "emoji": "👟"
+  },
+  {
+    "id": 5,
+    "name": "Travel Camera",
+    "category": "Electronics",
+    "description": "Compact camera for capturing travel adventures and memories.",
+    "image": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32",
+    "price": 120,
+    "currency": "USD",
+    "merchant": "Amazon",
+    "affiliateUrl": "https://www.amazon.com/",
+    "commission": 5,
+    "status": "active",
+    "emoji": "📷"
+  }
+]
